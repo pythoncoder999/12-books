@@ -1,0 +1,313 @@
+<title>Twelve Skills Reading List</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: progress header on top, one list of twelve skills on the left, a sticky preview panel on the right.
+   On phones the preview opens inline under the selected book instead. */
+:root {
+  --bg: #f6f4ef;
+  --surface: #ffffff;
+  --surface-2: #efece4;
+  --ink: #16181d;
+  --muted: #5d6068;
+  --line: #ddd9ce;
+  --accent: #b3261e;
+  --accent-ink: #ffffff;
+  --done: #1f7a4d;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14151a;
+    --surface: #1b1d24;
+    --surface-2: #252832;
+    --ink: #ebeaf0;
+    --muted: #9b9ea9;
+    --line: #2d303b;
+    --accent: #ff7b6e;
+    --accent-ink: #1a0b09;
+    --done: #4cc38a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14151a;
+  --surface: #1b1d24;
+  --surface-2: #252832;
+  --ink: #ebeaf0;
+  --muted: #9b9ea9;
+  --line: #2d303b;
+  --accent: #ff7b6e;
+  --accent-ink: #1a0b09;
+  --done: #4cc38a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+.wrap { max-width: 1100px; margin: 0 auto; }
+button { font: inherit; color: inherit; }
+
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+h1 {
+  font-family: var(--font-display); font-weight: 700; text-transform: uppercase;
+  font-size: clamp(36px, 7vw, 64px); line-height: 0.98; margin: 0 0 18px; text-wrap: balance;
+}
+h1 em { font-style: normal; color: var(--accent); }
+.progress {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 14px 20px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px;
+}
+.progress .num { font-family: var(--font-display); font-weight: 700; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.progress .num small { font-size: 18px; color: var(--muted); font-weight: 600; }
+.bar { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; min-width: 60px; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--done); border-radius: 99px; transition: width .25s ease; }
+.progress .msg { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.filters { display: inline-flex; background: var(--surface-2); border-radius: 8px; padding: 3px; gap: 2px; }
+.filters button { border: 0; background: transparent; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); }
+.filters button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+@media (max-width: 560px) {
+  .progress { grid-template-columns: auto 1fr; }
+  .filters { grid-column: 1 / -1; justify-self: start; }
+}
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; margin-top: 24px; align-items: start; }
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-width: 0; }
+.list ol { list-style: none; margin: 0; padding: 4px 0; }
+
+.book { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; border-top: 1px solid var(--line); }
+.book:first-child { border-top: 0; }
+.check { position: relative; display: grid; place-items: center; height: 100%; min-height: 60px; cursor: pointer; }
+.check input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.check span {
+  width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--muted); background: var(--surface);
+  display: grid; place-items: center; transition: background .15s, border-color .15s;
+}
+.check span::after {
+  content: ""; width: 5px; height: 10px; border: solid var(--bg); border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg) translate(-1px, -1px) scale(0); transition: transform .12s ease;
+}
+.check input:checked + span { background: var(--done); border-color: var(--done); }
+.check input:checked + span::after { transform: rotate(45deg) translate(-1px, -1px) scale(1); }
+.check input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.open { display: flex; flex-direction: column; align-items: flex-start; text-align: left; background: transparent; border: 0; padding: 10px 18px 10px 4px; cursor: pointer; width: 100%; min-width: 0; }
+.open:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; border-radius: 6px; }
+.open .sk { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.open .t { font-weight: 600; overflow-wrap: anywhere; }
+.open .a { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.book:hover .open { background: var(--surface-2); }
+.book.is-sel { background: var(--surface-2); }
+.book.is-sel .t { color: var(--accent); }
+.book.is-done .t { color: var(--muted); }
+.book.is-sel .open:hover { background: transparent; }
+
+.inline { grid-column: 1 / -1; padding: 4px 18px 16px 18px; display: none; }
+@media (max-width: 859px) { .inline:not([hidden]) { display: block; } }
+
+.detail .tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+.detail .tag i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.detail h3 { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.05; margin: 0; text-wrap: balance; }
+.detail .by { color: var(--muted); margin: 4px 0 14px; }
+.detail .lbl { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 14px 0 3px; }
+.detail p { margin: 0; max-width: 62ch; }
+.detail .note { margin-top: 14px; font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; }
+.toggle { margin-top: 18px; width: 100%; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; border: 2px solid var(--ink); background: transparent; color: var(--ink); }
+.toggle:hover { background: var(--surface-2); }
+.toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.toggle.on { background: var(--done); border-color: var(--done); color: var(--bg); }
+
+.panel { position: sticky; top: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+@media (max-width: 859px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .panel { display: none; }
+}
+.nothing { display: none; text-align: center; color: var(--muted); padding: 32px 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; margin-top: 16px; }
+.nothing.show { display: block; }
+.foot { margin-top: 26px; font-size: 12px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .bar > i, .check span, .check span::after { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">One book per skill</p>
+    <h1>12 books to master <em>12 skills</em></h1>
+    <div class="progress" aria-live="polite">
+      <div class="num"><span id="doneNum">0</span><small> / 12</small></div>
+      <div>
+        <div class="bar" role="progressbar" aria-label="Books read" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" id="bar"><i id="barFill"></i></div>
+        <div class="msg" id="msg"></div>
+      </div>
+      <div class="filters" role="group" aria-label="Filter books" id="filters">
+        <button type="button" data-f="all" aria-pressed="true">All</button>
+        <button type="button" data-f="todo" aria-pressed="false">To read</button>
+        <button type="button" data-f="done" aria-pressed="false">Read</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout" id="layout">
+    <div class="list"><ol id="list"></ol></div>
+    <aside class="panel detail" id="panel" aria-label="Book preview"></aside>
+  </div>
+  <div class="nothing" id="nothing"></div>
+  <p class="foot">Summaries are short paraphrases for deciding what to read next, not a substitute for the books. Your checkmarks are saved in this browser.</p>
+</div>
+
+<script>
+const KEY = 'twelve-skills-reading-v1';
+const BOOKS = [
+  { sk: 'Productivity', t: 'Deep Work', a: 'Cal Newport',
+    s: 'Argues that the ability to focus without distraction on mentally demanding work is becoming rare and valuable, and gives rules for building routines that protect it.',
+    k: 'Schedule long blocks of distraction-free work and treat shallow tasks as secondary.',
+    f: 'You are always busy but rarely produce your best work.' },
+  { sk: 'Money', t: 'The Psychology of Money', a: 'Morgan Housel',
+    s: 'Short essays arguing that how you behave with money matters more than how much you know. Topics include luck and risk, saving, patience and knowing what is enough.',
+    k: 'Good financial results come from behavior you can keep up for decades.',
+    f: 'You understand the math but struggle with the decisions.' },
+  { sk: 'Habits', t: 'Atomic Habits', a: 'James Clear',
+    s: 'Shows how tiny daily changes compound. It gives four rules for building a habit: make the cue obvious, the habit attractive, the action easy and the reward satisfying.',
+    k: 'Build systems and a sense of identity instead of relying on motivation.',
+    f: 'Consistency is the thing holding you back.' },
+  { sk: 'Thinking', t: 'The Intelligence Trap', a: 'David Robson',
+    s: 'Explains why smart, educated people still fall for flawed reasoning, since intelligence can be used to defend a belief as easily as to test it. It offers ways to think more wisely, such as intellectual humility and considering other views.',
+    k: 'Intelligence does not protect you from bias, so look for evidence against your own view.',
+    f: 'You want to make fewer confident mistakes.' },
+  { sk: 'Self-knowledge', t: 'The Courage to Be Disliked', a: 'Ichiro Kishimi & Fumitake Koga',
+    s: 'A conversation between a philosopher and a young man, based on Alfred Adler’s psychology. It argues that you are not trapped by your past or by other people’s approval, and separates your own tasks from other people’s.',
+    k: 'Focus on what you control and stop living for approval.',
+    f: 'You worry too much about what others think.' },
+  { sk: 'Discipline', t: 'Can’t Hurt Me', a: 'David Goggins',
+    s: 'A memoir of a hard childhood, Navy SEAL training and ultra-endurance racing. It introduces ideas such as the accountability mirror and the 40% rule, which says your mind quits long before your body does.',
+    k: 'Test your limits on purpose, because you can do more than you think.',
+    f: 'You need a push to start doing hard things.' },
+  { sk: 'Communication', t: 'How to Talk to Anyone', a: 'Leil Lowndes',
+    s: 'A collection of 92 short tips for starting conversations, building rapport and making a strong first impression, in both social and business settings.',
+    k: 'Small habits, like asking good questions and showing real interest, put people at ease.',
+    f: 'Small talk and first meetings feel awkward.' },
+  { sk: 'Sleep', t: 'Why We Sleep', a: 'Matthew Walker',
+    s: 'A neuroscientist argues that sleep is vital for memory, mood and health, and describes what happens when you get too little.',
+    k: 'Treat sleep as non-negotiable: keep a steady schedule and protect enough hours.',
+    f: 'You trade sleep for productivity.',
+    n: 'Some of the book’s stronger claims have been disputed by other researchers, so treat it as a starting point and check the sources.' },
+  { sk: 'Negotiation', t: 'Never Split the Difference', a: 'Chris Voss',
+    s: 'A former FBI hostage negotiator explains techniques for everyday negotiations, including tactical empathy, mirroring, labeling emotions and asking calibrated questions.',
+    k: 'Listen first and ask open “how” and “what” questions instead of pushing your position.',
+    f: 'You negotiate prices, salary or deals and want a method.' },
+  { sk: 'Strategy', t: 'Your Next Five Moves', a: 'Patrick Bet-David',
+    s: 'Uses chess as a model for strategic thinking in business and life: plan several moves ahead, read your own position and anticipate how others will respond.',
+    k: 'Think a few moves ahead before you act.',
+    f: 'You react to events instead of planning around them.' },
+  { sk: 'Human behavior', t: 'The Social Animal', a: 'Elliot Aronson',
+    s: 'A classic of social psychology on how people are shaped by those around them, covering conformity, persuasion, attraction, prejudice and aggression.',
+    k: 'Situations and social pressure shape behavior more than most people realize.',
+    f: 'You want to understand why people act the way they do.' },
+  { sk: 'Reading', t: 'How to Read a Book', a: 'Mortimer J. Adler & Charles Van Doren',
+    s: 'A guide to reading at four levels, from elementary to inspectional, analytical and syntopical, so you get more from difficult books.',
+    k: 'Read actively: ask what the book is about, what it says, whether it is true, and what it means to you.',
+    f: 'You finish books and remember little.' }
+];
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const TOTAL = BOOKS.length;
+BOOKS.forEach((b, i) => { b.id = String(i); });
+const byId = {}; BOOKS.forEach(b => { byId[b.id] = b; });
+
+let done = new Set();
+try { done = new Set(JSON.parse(localStorage.getItem(KEY) || '[]').filter(id => byId[id])); } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify([...done])); } catch (e) {} }
+
+let selected = '0';
+let filter = 'all';
+
+function detailHtml(b) {
+  const on = done.has(b.id);
+  return '<div class="detail">' +
+    '<p class="tag"><i></i>Skill · ' + esc(b.sk) + '</p>' +
+    '<h3>' + esc(b.t) + '</h3>' +
+    '<p class="by">' + esc(b.a) + '</p>' +
+    '<p class="lbl">What it covers</p><p>' + esc(b.s) + '</p>' +
+    '<p class="lbl">Key takeaway</p><p>' + esc(b.k) + '</p>' +
+    '<p class="lbl">Read it if</p><p>' + esc(b.f) + '</p>' +
+    (b.n ? '<p class="note">' + esc(b.n) + '</p>' : '') +
+    '<button type="button" class="toggle' + (on ? ' on' : '') + '" data-toggle="' + b.id + '">' + (on ? 'Read ✓ (tap to undo)' : 'Mark as read') + '</button>' +
+    '</div>';
+}
+
+function buildList() {
+  $('#list').innerHTML = BOOKS.map(b =>
+    '<li class="book" data-id="' + b.id + '">' +
+      '<label class="check"><input type="checkbox" data-check="' + b.id + '" aria-label="Mark ' + esc(b.t) + ' as read"><span></span></label>' +
+      '<button type="button" class="open" data-open="' + b.id + '" aria-expanded="false"><span class="sk">' + esc(b.sk) + '</span><span class="t">' + esc(b.t) + '</span><span class="a">' + esc(b.a) + '</span></button>' +
+      '<div class="inline" hidden></div>' +
+    '</li>').join('');
+}
+
+function refresh() {
+  let visible = 0;
+  document.querySelectorAll('.book').forEach(li => {
+    const id = li.dataset.id;
+    const isDone = done.has(id);
+    li.classList.toggle('is-done', isDone);
+    li.classList.toggle('is-sel', id === selected);
+    $('input', li).checked = isDone;
+    $('.open', li).setAttribute('aria-expanded', id === selected ? 'true' : 'false');
+    const inl = $('.inline', li);
+    if (id === selected) { inl.hidden = false; inl.innerHTML = detailHtml(byId[id]); } else { inl.hidden = true; inl.innerHTML = ''; }
+    const show = filter === 'all' || (filter === 'done' ? isDone : !isDone);
+    li.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  $('.list').style.display = visible === 0 ? 'none' : '';
+  const nothing = $('#nothing');
+  nothing.classList.toggle('show', visible === 0);
+  nothing.textContent = filter === 'done' ? 'Nothing here yet. Check off a book and it shows up under Read.' : 'Everything is read. Nicely done.';
+  const d = done.size;
+  $('#doneNum').textContent = d;
+  $('#barFill').style.width = (d / TOTAL * 100) + '%';
+  $('#bar').setAttribute('aria-valuenow', d);
+  $('#msg').textContent = d === 0 ? 'Pick a book to preview it, then check it off when you finish.'
+    : d === TOTAL ? 'All 12 books read.' : (TOTAL - d) + ' to go.';
+  $('#panel').innerHTML = detailHtml(byId[selected]);
+}
+
+document.addEventListener('click', e => {
+  const open = e.target.closest('[data-open]');
+  if (open) { selected = open.dataset.open; refresh(); return; }
+  const tg = e.target.closest('[data-toggle]');
+  if (tg) {
+    const id = tg.dataset.toggle;
+    done.has(id) ? done.delete(id) : done.add(id);
+    save(); refresh(); return;
+  }
+  const f = e.target.closest('[data-f]');
+  if (f) {
+    filter = f.dataset.f;
+    document.querySelectorAll('#filters button').forEach(b => b.setAttribute('aria-pressed', b === f ? 'true' : 'false'));
+    refresh();
+  }
+});
+document.addEventListener('change', e => {
+  const c = e.target.closest('[data-check]');
+  if (!c) return;
+  const id = c.dataset.check;
+  c.checked ? done.add(id) : done.delete(id);
+  save(); refresh();
+});
+
+buildList();
+refresh();
+</script>
